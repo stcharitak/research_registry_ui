@@ -1,0 +1,14 @@
+services:
+  ui:
+    build:
+      context: .
+    container_name: research_registry_ui
+    restart: unless-stopped
+    ports:
+      - "3000:80"
+    networks:
+      - research_registry_net
+
+networks:
+  research_registry_net:
+    external: true

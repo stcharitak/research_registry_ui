@@ -9,7 +9,7 @@ import {
 } from "../auth/authStorage";
 
 const api = axios.create({
-    baseURL: "http://127.0.0.1:8000",
+    baseURL: "/",
 });
 
 api.interceptors.request.use((config: InternalAxiosRequestConfig) => {
@@ -36,7 +36,7 @@ api.interceptors.response.use(
 
             try {
                 const response = await axios.post(
-                    "http://127.0.0.1:8000/api/token/refresh/",
+                    "/api/token/refresh/",
                     {
                         refresh: getRefreshToken(),
                     }
