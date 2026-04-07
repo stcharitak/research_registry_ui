@@ -1,10 +1,11 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router";
-import LoginPage from "./pages/LoginPage";
+import SignIn from "./pages/AuthPages/SignIn.tsx";
 import ExportsPage from "./pages/ExportsPage.tsx";
 
 import AppLayout from "./layout/AppLayout";
 import { ScrollToTop } from "./components/common/ScrollToTop";
 import Home from "./pages/Dashboard/Home";
+import ProtectedRoute from "./auth/ProtectedRoute.tsx";
 
 export default function App() {
   return (
@@ -13,14 +14,19 @@ export default function App() {
         <ScrollToTop />
         <Routes>
           {/* Dashboard Layout */}
-          <Route element={<AppLayout />}>
-            <Route index path="/" element={<Home />} />
-
+          <Route
+            element={
+              <ProtectedRoute>
+                <AppLayout />
+              </ProtectedRoute>
+            }
+          >
+            <Route path="/" element={<Home />} />
             <Route path="/exports" element={<ExportsPage />} />
           </Route>
 
           {/* Auth Layout */}
-          <Route path="/login" element={<LoginPage />} />
+          <Route path="/signin" element={<SignIn />} />
 
         </Routes>
       </Router>
