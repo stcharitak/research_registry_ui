@@ -5,6 +5,8 @@ import { fetchDashboardStats } from "../../services/dashboardService";
 import ParticipantsTable from "../../components/tables/ParticipantsTable";
 import StudiesTable from "../../components/tables/StudiesTable";
 import ApplicationsTable from "../../components/tables/ApplicationsTable";
+import { getCurrentUserFromToken } from "../../auth/jwt";
+import { User } from "../../components/tables/UsersTable";
 
 type DashboardStats = {
   totalStudies: number;
@@ -19,6 +21,7 @@ export default function Home() {
     totalParticipants: 0,
   });
 
+  const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -30,6 +33,8 @@ export default function Home() {
 
         const data = await fetchDashboardStats();
         setStats(data);
+        const currentUser = getCurrentUserFromToken();
+        setCurrentUser(currentUser);
       } catch (err) {
         setError("Failed to load dashboard statistics.");
       } finally {
@@ -55,7 +60,7 @@ export default function Home() {
           />
           <ParticipantsTable />
           <StudiesTable />
-          <ApplicationsTable />
+          <ApplicationsTable currentUser={currentUser} />
         </div>
       </div>
     </>
