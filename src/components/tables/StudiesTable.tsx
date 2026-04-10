@@ -1,21 +1,6 @@
 import { useEffect, useState } from "react";
-import api from "../../api/client";
-
-export type Study = {
-    id: number;
-    title: string;
-    description?: string | null;
-    status: string;
-    created_by_username: string;
-    created_at?: Date | string;
-};
-
-type StudiesResponse = {
-    count: number;
-    next: string | null;
-    previous: string | null;
-    results: Study[];
-};
+import type { Study } from "../../types/study";
+import { fetchStudies as fetchStudiesPage } from "../../services/studiesService";
 
 export default function StudiesTable() {
     const [studies, setStudies] = useState<Study[]>([]);
@@ -31,14 +16,12 @@ export default function StudiesTable() {
             setLoading(true);
             setError("");
 
-            const response = await api.get<StudiesResponse>(
-                `/api/studies/?page=${page}`
-            );
+            const data = await fetchStudiesPage(page);
 
-            setStudies(response.data.results);
-            setCount(response.data.count);
-            setNextUrl(response.data.next);
-            setPreviousUrl(response.data.previous);
+            setStudies(data.results);
+            setCount(data.count);
+            setNextUrl(data.next);
+            setPreviousUrl(data.previous);
             setCurrentPage(page);
         } catch (err) {
             console.error("Failed to fetch studies", err);
