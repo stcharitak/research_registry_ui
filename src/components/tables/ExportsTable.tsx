@@ -31,10 +31,6 @@ export default function ExportsTable() {
                 responseType: "blob",
             });
 
-            console.log("status:", response.status);
-            console.log("content-type:", response.headers["content-type"]);
-            console.log("response url:", response.request?.responseURL);
-
             const contentType = response.headers["content-type"];
 
             if (contentType && contentType.includes("text/html")) {
@@ -134,7 +130,7 @@ export default function ExportsTable() {
                                         Created at
                                     </th>
                                     <th className="px-4 py-3 text-left text-sm font-medium text-gray-500 dark:text-gray-400">
-                                        Download URL
+                                        Action
                                     </th>
                                 </tr>
                             </thead>

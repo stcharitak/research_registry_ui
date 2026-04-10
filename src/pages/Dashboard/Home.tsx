@@ -37,6 +37,8 @@ export default function Home() {
         setCurrentUser(currentUser);
       } catch (err) {
         setError("Failed to load dashboard statistics.");
+        console.log("Error fetching dashboard stats:", error);
+
       } finally {
         setLoading(false);
       }
