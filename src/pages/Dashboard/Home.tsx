@@ -6,13 +6,8 @@ import ParticipantsTable from "../../components/tables/ParticipantsTable";
 import StudiesTable from "../../components/tables/StudiesTable";
 import ApplicationsTable from "../../components/tables/ApplicationsTable";
 import { getCurrentUserFromToken } from "../../auth/jwt";
-import { User } from "../../components/tables/UsersTable";
-
-type DashboardStats = {
-  totalStudies: number;
-  totalApplications: number;
-  totalParticipants: number;
-};
+import type { User } from "../../types/user";
+import type { DashboardStats } from "../../types/dashboard";
 
 export default function Home() {
   const [stats, setStats] = useState<DashboardStats>({

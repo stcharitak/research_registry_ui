@@ -1,23 +1,12 @@
 import { useEffect, useState } from "react";
-import api from "../../api/client";
-
-export type Export = {
-    id: number;
-    export_type: string;
-    status: string;
-    created_at?: Date | string;
-    download_url?: string | null;
-};
-
-type ExportsResponse = {
-    count: number;
-    next: string | null;
-    previous: string | null;
-    results: Export[];
-};
+import type { ExportJob } from "../../types/export";
+import {
+    downloadExport,
+    fetchExports as fetchExportsPage,
+} from "../../services/exportsService";
 
 export default function ExportsTable() {
-    const [exports, setExports] = useState<Export[]>([]);
+    const [exports, setExports] = useState<ExportJob[]>([]);
     const [count, setCount] = useState(0);
     const [nextUrl, setNextUrl] = useState<string | null>(null);
     const [previousUrl, setPreviousUrl] = useState<string | null>(null);
@@ -27,32 +16,15 @@ export default function ExportsTable() {
 
     const handleDownloadExport = async (exportId: number) => {
         try {
-            const response = await api.get(`api/exports/${exportId}/download/`, {
-                responseType: "blob",
-            });
-
-            const contentType = response.headers["content-type"];
-
-            if (contentType && contentType.includes("text/html")) {
-                const text = await response.data.text();
-                console.error("Expected CSV but got HTML:", text);
+            const download = await downloadExport(exportId);
+            if (!download) {
+                console.error("Expected CSV but got HTML.");
                 return;
             }
-
-            const disposition = response.headers["content-disposition"];
-            let filename = `export-${exportId}.csv`;
-
-            if (disposition) {
-                const match = disposition.match(/filename="(.+)"/);
-                if (match?.[1]) {
-                    filename = match[1];
-                }
-            }
-
-            const url = window.URL.createObjectURL(response.data);
+            const url = window.URL.createObjectURL(download.blob);
             const link = document.createElement("a");
             link.href = url;
-            link.download = filename;
+            link.download = download.filename;
             document.body.appendChild(link);
             link.click();
             link.remove();
@@ -67,14 +39,12 @@ export default function ExportsTable() {
             setLoading(true);
             setError("");
 
-            const response = await api.get<ExportsResponse>(
-                `/api/exports/?page=${page}`
-            );
+            const data = await fetchExportsPage(page);
 
-            setExports(response.data.results);
-            setCount(response.data.count);
-            setNextUrl(response.data.next);
-            setPreviousUrl(response.data.previous);
+            setExports(data.results);
+            setCount(data.count);
+            setNextUrl(data.next);
+            setPreviousUrl(data.previous);
             setCurrentPage(page);
         } catch (err) {
             console.error("Failed to fetch exports", err);

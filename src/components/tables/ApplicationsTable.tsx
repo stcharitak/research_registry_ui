@@ -1,24 +1,12 @@
 import { useEffect, useState } from "react";
-import api from "../../api/client";
-import type { Participant } from "./ParticipantsTable";
-import { Study } from "./StudiesTable";
-import { User } from "./UsersTable";
-
-export type Application = {
-    id: number;
-    participant: Participant;
-    study?: Study | null;
-    status: string;
-    reviewed_by?: User | null;
-    created_at?: Date | string;
-};
-
-type ApplicationsResponse = {
-    count: number;
-    next: string | null;
-    previous: string | null;
-    results: Application[];
-};
+import type { Application } from "../../types/application";
+import type { User } from "../../types/user";
+import {
+    approveApplication,
+    fetchApplications as fetchApplicationsPage,
+    rejectApplication,
+    requestApplicationsExport,
+} from "../../services/applicationsService";
 
 type Props = {
     currentUser: User | null;
@@ -42,7 +30,7 @@ export default function ApplicationsTable({
     };
     const handleApprove = async (applicationId: number) => {
         try {
-            await api.post(`/api/applications/${applicationId}/approve/`);
+            await approveApplication(applicationId);
 
             setApplications((prevApplications) =>
                 prevApplications.map((application) =>
@@ -69,7 +57,7 @@ export default function ApplicationsTable({
 
     const handleReject = async (applicationId: number) => {
         try {
-            await api.post(`/api/applications/${applicationId}/reject/`);
+            await rejectApplication(applicationId);
 
             setApplications((prevApplications) =>
                 prevApplications.map((application) =>
@@ -141,9 +129,7 @@ export default function ApplicationsTable({
             setExporting(true);
             setExportMessage("");
 
-            await api.post("/api/exports/", {
-                export_type: "applications",
-            });
+            await requestApplicationsExport();
 
             setExportMessage("Export job created successfully.");
         } catch (error) {
@@ -169,12 +155,12 @@ export default function ApplicationsTable({
             if (filters.reviewed_by) params.reviewed_by = filters.reviewed_by;
             if (ordering) params.ordering = ordering;
 
-            const response = await api.get<ApplicationsResponse>("/api/applications/", { params });
+            const data = await fetchApplicationsPage(params);
 
-            setApplications(response.data.results);
-            setCount(response.data.count);
-            setNextUrl(response.data.next);
-            setPreviousUrl(response.data.previous);
+            setApplications(data.results);
+            setCount(data.count);
+            setNextUrl(data.next);
+            setPreviousUrl(data.previous);
             setCurrentPage(page);
         } catch (err) {
             console.error("Failed to fetch applications", err);

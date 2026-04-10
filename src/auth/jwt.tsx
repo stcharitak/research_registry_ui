@@ -1,14 +1,8 @@
 import { jwtDecode } from "jwt-decode";
-import { User } from "../components/tables/UsersTable";
+import type { User } from "../types/user";
 import { getAccessToken } from "./authStorage";
 
-export type DecodedToken = {
-    id: number;
-    username: string;
-    first_name: string;
-    last_name: string;
-    email: string;
-    role: string;
+export type DecodedToken = User & {
     exp: number;
 };
 

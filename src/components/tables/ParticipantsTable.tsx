@@ -1,23 +1,6 @@
 import { useEffect, useState } from "react";
-import api from "../../api/client";
-
-export type Participant = {
-    id: number;
-    code: string;
-    first_name: string;
-    last_name: string;
-    email?: string | null;
-    birth_year: number;
-    consent?: boolean | false;
-    created_at?: Date | string;
-};
-
-type ParticipantsResponse = {
-    count: number;
-    next: string | null;
-    previous: string | null;
-    results: Participant[];
-};
+import type { Participant } from "../../types/participant";
+import { fetchParticipants as fetchParticipantsPage } from "../../services/participantsService";
 
 export default function ParticipantsTable() {
     const [participants, setParticipants] = useState<Participant[]>([]);
@@ -33,14 +16,12 @@ export default function ParticipantsTable() {
             setLoading(true);
             setError("");
 
-            const response = await api.get<ParticipantsResponse>(
-                `/api/participants/?page=${page}`
-            );
+            const data = await fetchParticipantsPage(page);
 
-            setParticipants(response.data.results);
-            setCount(response.data.count);
-            setNextUrl(response.data.next);
-            setPreviousUrl(response.data.previous);
+            setParticipants(data.results);
+            setCount(data.count);
+            setNextUrl(data.next);
+            setPreviousUrl(data.previous);
             setCurrentPage(page);
         } catch (err) {
             console.error("Failed to fetch participants", err);
