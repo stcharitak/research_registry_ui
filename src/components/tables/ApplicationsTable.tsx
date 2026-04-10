@@ -5,6 +5,7 @@ import {
     approveApplication,
     fetchApplications as fetchApplicationsPage,
     rejectApplication,
+    type ApplicationsExportFilters,
     requestApplicationsExport,
 } from "../../services/applicationsService";
 
@@ -129,7 +130,34 @@ export default function ApplicationsTable({
             setExporting(true);
             setExportMessage("");
 
-            await requestApplicationsExport();
+            const exportFilters: ApplicationsExportFilters = {};
+
+            if (filters.status) {
+                exportFilters.status = filters.status;
+            }
+
+            if (filters.study) {
+                const studyId = Number.parseInt(filters.study, 10);
+                if (!Number.isNaN(studyId)) {
+                    exportFilters.study_id = studyId;
+                }
+            }
+
+            if (filters.participant) {
+                const participantId = Number.parseInt(filters.participant, 10);
+                if (!Number.isNaN(participantId)) {
+                    exportFilters.participant_id = participantId;
+                }
+            }
+
+            if (filters.reviewed_by) {
+                const reviewedById = Number.parseInt(filters.reviewed_by, 10);
+                if (!Number.isNaN(reviewedById)) {
+                    exportFilters.reviewed_by_id = reviewedById;
+                }
+            }
+
+            await requestApplicationsExport(exportFilters);
 
             setExportMessage("Export job created successfully.");
         } catch (error) {

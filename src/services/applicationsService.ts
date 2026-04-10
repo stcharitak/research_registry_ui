@@ -11,6 +11,13 @@ export type ApplicationsQuery = {
   ordering?: string;
 };
 
+export type ApplicationsExportFilters = {
+  status?: string;
+  study_id?: number;
+  participant_id?: number;
+  reviewed_by_id?: number;
+};
+
 export async function fetchApplications(
   query: ApplicationsQuery = {},
 ): Promise<PaginatedResponse<Application>> {
@@ -28,8 +35,11 @@ export async function rejectApplication(applicationId: number): Promise<void> {
   await api.post(`/api/applications/${applicationId}/reject/`);
 }
 
-export async function requestApplicationsExport(): Promise<void> {
+export async function requestApplicationsExport(
+  filters: ApplicationsExportFilters = {},
+): Promise<void> {
   await api.post("/api/exports/", {
     export_type: "applications",
+    filters,
   });
 }
